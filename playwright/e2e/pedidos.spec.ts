@@ -11,7 +11,7 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
   //Checkpoint
   await expect(page.getByRole('heading')).toContainText('Consultar Pedido');
 
-  await page.getByTestId('search-order-id').click();
+  //await page.getByTestId('search-order-id').click();
 
   await page.getByTestId('search-order-id').fill('VLO-MMXKY1');
 
