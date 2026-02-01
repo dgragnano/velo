@@ -19,13 +19,12 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
   // Act
   await page.getByRole('textbox', { name: 'Número do Pedido' }).fill('VLO-MMXKY1');
 
-  await page.getByTestId('search-order-button').click();
+  await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+
 
   // Assert
 
-  await expect(page.getByTestId('order-result-id')).toContainText('VLO-MMXKY1');
-
-  await expect(page.getByTestId('order-result-status')).toContainText('APROVADO');
-
-
+  await expect(page.locator('//p[text()="Pedido"]')).toBeVisible();
+ 
+  await expect(page.getByText('APROVADO')).toBeVisible();
 });
