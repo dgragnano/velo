@@ -5,6 +5,9 @@ import { test, expect } from '@playwright/test';
 test('deve consultar um pedido aprovado', async ({ page }) => {
   await page.goto('http://localhost:5173/')
 
+  //Teste Data
+  const order = 'VLO-MMXKY1';
+
 
   // Arrange
   //Checkpoint  
@@ -17,18 +20,18 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
 
 
   // Act
-  await page.getByRole('textbox', { name: 'Número do Pedido' }).fill('VLO-MMXKY1')
+  await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order)
 
   await page.getByRole('button', { name: 'Buscar Pedido' }).click()
 
-
+  
   // Assert
 
   const containerPedido = page.getByRole('paragraph')
     .filter({ hasText: /^Pedido$/ })
     .locator('..') //Sobe um nível e pega o elemento pai (a div que agrupa ambos)
 
-  await expect(containerPedido).toContainText('VLO-MMXKY1', {timeout: 10_000})
+  await expect(containerPedido).toContainText(order, {timeout: 10_000})
 
   await expect(page.getByText('APROVADO')).toBeVisible({timeout: 10_000})
 
