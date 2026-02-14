@@ -39,15 +39,10 @@ test.describe('Consulta de Pedidos', () => {
 
     await page.getByRole('link', { name: 'Consultar Pedido' }).click()
     await expect(page.getByRole('heading')).toContainText('Consultar Pedido')
-
-
-
   })
 
 
   test('deve consultar um pedido aprovado', async ({ page }) => {
-
-
     //Teste Data
     //const order = 'VLO-MMXKY1'
 
@@ -108,7 +103,6 @@ test.describe('Consulta de Pedidos', () => {
       `);
 
   })
-
 
   test('deve consultar um pedido reprovado', async ({ page }) => {
 
@@ -174,6 +168,71 @@ test.describe('Consulta de Pedidos', () => {
 
   })
 
+  test('deve consultar um pedido em análise', async ({ page }) => {
+
+
+    //Teste Data
+    //const order = 'VLO-CYYEJJ'
+
+    const order = {
+      number: 'VLO-CZ30J2',
+      status: 'EM_ANALISE',
+      color: 'Glacier Blue',
+      wheels: 'sport Wheels',
+      customer: {
+        name: 'José Bernardes',
+        email: 'bernardes@jose.com'
+      },
+      payment: 'À Vista'
+    }
+
+    // Act
+    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
+    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+
+
+    // Assert
+
+    /* const containerPedido = page.getByRole('paragraph')
+      .filter({ hasText: /^Pedido$/ })
+      .locator('..') //Sobe um nível e pega o elemento pai (a div que agrupa ambos)
+
+    await expect(containerPedido).toContainText(order, { timeout: 10_000 })
+
+    await expect(page.getByText('APROVADO')).toBeVisible({ timeout: 10_000 }) */
+
+    await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
+      - img
+      - paragraph: Pedido
+      - paragraph: ${order.number}
+      - img
+      - text: ${order.status}
+      - img "Velô Sprint"
+      - paragraph: Modelo
+      - paragraph: Velô Sprint
+      - paragraph: Cor
+      - paragraph: ${order.color}
+      - paragraph: Interior
+      - paragraph: cream
+      - paragraph: Rodas
+      - paragraph: ${order.wheels}
+      - heading "Dados do Cliente" [level=4]
+      - paragraph: Nome
+      - paragraph: ${order.customer.name}
+      - paragraph: Email
+      - paragraph: ${order.customer.email}
+      - paragraph: Loja de Retirada
+      - paragraph
+      - paragraph: Data do Pedido
+      - paragraph: /\\d+\\/\\d+\\/\\d+/
+      - heading "Pagamento" [level=4]
+      - paragraph: ${order.payment}
+      - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
+      `);
+
+  })
+
+
   test('deve exibir mensagem para pedido não encontrado', async ({ page }) => {
 
     const order = generateOrderCode()
@@ -219,9 +278,6 @@ test.describe('Consulta de Pedidos', () => {
     `)
 
   })
-
-
-
 
 })
 
