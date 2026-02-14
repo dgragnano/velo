@@ -73,12 +73,13 @@ test.describe('Consulta de Pedidos', () => {
 
     await expect(page.getByText('APROVADO')).toBeVisible({ timeout: 10_000 }) */
 
-       await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
+    await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
       - img
       - paragraph: Pedido
       - paragraph: ${order.number}
-      - img
-      - text: ${order.status}
+      - status:
+        - img
+        - text: ${order.status}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
@@ -101,6 +102,13 @@ test.describe('Consulta de Pedidos', () => {
       - paragraph: ${order.payment}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
       `);
+
+    const statusBadge = page.getByRole('status').filter({ hasText: 'APROVADO' })
+    await expect(statusBadge).toHaveClass(/bg-green-100/)
+    await expect(statusBadge).toHaveClass(/text-green-700/)
+
+    const statusIcon = statusBadge.locator('svg')
+    await expect(statusIcon).toHaveClass(/lucide-circle-check-big/)
 
   })
 
@@ -141,8 +149,9 @@ test.describe('Consulta de Pedidos', () => {
       - img
       - paragraph: Pedido
       - paragraph: ${order.number}
-      - img
-      - text: ${order.status}
+      - status:
+        - img
+        - text: ${order.status}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
@@ -165,6 +174,13 @@ test.describe('Consulta de Pedidos', () => {
       - paragraph: ${order.payment}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
       `);
+
+      const statusBadge = page.getByRole('status').filter({ hasText: 'REPROVADO' })
+      await expect(statusBadge).toHaveClass(/bg-red-100/)
+      await expect(statusBadge).toHaveClass(/text-red-700/)
+  
+      const statusIcon = statusBadge.locator('svg')
+      await expect(statusIcon).toHaveClass(/lucide-circle-x/)
 
   })
 
@@ -205,8 +221,9 @@ test.describe('Consulta de Pedidos', () => {
       - img
       - paragraph: Pedido
       - paragraph: ${order.number}
-      - img
-      - text: ${order.status}
+      - status:
+        - img
+        - text: ${order.status}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
@@ -229,6 +246,14 @@ test.describe('Consulta de Pedidos', () => {
       - paragraph: ${order.payment}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
       `);
+
+      const statusBadge = page.getByRole('status').filter({ hasText: 'EM_ANALISE' })
+      await expect(statusBadge).toHaveClass(/bg-amber-100/)
+      await expect(statusBadge).toHaveClass(/text-amber-700/)
+  
+      const statusIcon = statusBadge.locator('svg')
+      await expect(statusIcon).toHaveClass(/lucide-clock/)
+
 
   })
 
