@@ -2,36 +2,12 @@ import { test, expect } from '@playwright/test'
 
 import { generateOrderCode } from '../support/helpers'
 
+import { OrderLookupPage } from '../support/pages/OrderLookupPage'
+
 /// AAA - Arrange, Act, Assert
 
 //agrupador de cenários de teste
 test.describe('Consulta de Pedidos', () => {
-
-  //Ganchos para chamar repetição nos cenários de teste
-
-  /* test.beforeAll(async () => {
-    console.log(
-      'beforeAll: roda uma vez antes de todos os testes.'
-    )
-  }) */
-
-  /* test.beforeEach(async () => {
-    console.log(
-      'beforeEach: roda antes de cada teste.'
-    )
-  }) */
-
-  /* test.afterEach(async () => {
-    console.log(
-      'afterEach: roda depois de cada teste.'
-    )
-  }) */
-
-  /*  test.afterAll(async () => {
-     console.log(
-       'afterAll: roda uma vez depois de todos os testes.'
-     )
-   }) */
 
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:5173/')
@@ -59,19 +35,13 @@ test.describe('Consulta de Pedidos', () => {
     }
 
     // Act
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+
+    const orderLookupPage = new OrderLookupPage(page)
+
+    await orderLookupPage.buscar(order.number)
 
 
     // Assert
-
-    /* const containerPedido = page.getByRole('paragraph')
-      .filter({ hasText: /^Pedido$/ })
-      .locator('..') //Sobe um nível e pega o elemento pai (a div que agrupa ambos)
-
-    await expect(containerPedido).toContainText(order, { timeout: 10_000 })
-
-    await expect(page.getByText('APROVADO')).toBeVisible({ timeout: 10_000 }) */
 
     await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
       - img
@@ -114,7 +84,6 @@ test.describe('Consulta de Pedidos', () => {
 
   test('deve consultar um pedido reprovado', async ({ page }) => {
 
-
     //Teste Data
     //const order = 'VLO-CYYEJJ'
 
@@ -131,19 +100,12 @@ test.describe('Consulta de Pedidos', () => {
     }
 
     // Act
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+
+    await orderLookupPage.buscar(order.number)
 
 
     // Assert
-
-    /* const containerPedido = page.getByRole('paragraph')
-      .filter({ hasText: /^Pedido$/ })
-      .locator('..') //Sobe um nível e pega o elemento pai (a div que agrupa ambos)
-
-    await expect(containerPedido).toContainText(order, { timeout: 10_000 })
-
-    await expect(page.getByText('APROVADO')).toBeVisible({ timeout: 10_000 }) */
 
     await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
       - img
@@ -175,17 +137,16 @@ test.describe('Consulta de Pedidos', () => {
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
       `);
 
-      const statusBadge = page.getByRole('status').filter({ hasText: 'REPROVADO' })
-      await expect(statusBadge).toHaveClass(/bg-red-100/)
-      await expect(statusBadge).toHaveClass(/text-red-700/)
-  
-      const statusIcon = statusBadge.locator('svg')
-      await expect(statusIcon).toHaveClass(/lucide-circle-x/)
+    const statusBadge = page.getByRole('status').filter({ hasText: 'REPROVADO' })
+    await expect(statusBadge).toHaveClass(/bg-red-100/)
+    await expect(statusBadge).toHaveClass(/text-red-700/)
+
+    const statusIcon = statusBadge.locator('svg')
+    await expect(statusIcon).toHaveClass(/lucide-circle-x/)
 
   })
 
   test('deve consultar um pedido em análise', async ({ page }) => {
-
 
     //Teste Data
     //const order = 'VLO-CYYEJJ'
@@ -203,19 +164,12 @@ test.describe('Consulta de Pedidos', () => {
     }
 
     // Act
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+
+    await orderLookupPage.buscar(order.number)
 
 
     // Assert
-
-    /* const containerPedido = page.getByRole('paragraph')
-      .filter({ hasText: /^Pedido$/ })
-      .locator('..') //Sobe um nível e pega o elemento pai (a div que agrupa ambos)
-
-    await expect(containerPedido).toContainText(order, { timeout: 10_000 })
-
-    await expect(page.getByText('APROVADO')).toBeVisible({ timeout: 10_000 }) */
 
     await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
       - img
@@ -247,12 +201,12 @@ test.describe('Consulta de Pedidos', () => {
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
       `);
 
-      const statusBadge = page.getByRole('status').filter({ hasText: 'EM_ANALISE' })
-      await expect(statusBadge).toHaveClass(/bg-amber-100/)
-      await expect(statusBadge).toHaveClass(/text-amber-700/)
-  
-      const statusIcon = statusBadge.locator('svg')
-      await expect(statusIcon).toHaveClass(/lucide-clock/)
+    const statusBadge = page.getByRole('status').filter({ hasText: 'EM_ANALISE' })
+    await expect(statusBadge).toHaveClass(/bg-amber-100/)
+    await expect(statusBadge).toHaveClass(/text-amber-700/)
+
+    const statusIcon = statusBadge.locator('svg')
+    await expect(statusIcon).toHaveClass(/lucide-clock/)
 
 
   })
@@ -262,8 +216,9 @@ test.describe('Consulta de Pedidos', () => {
 
     const order = generateOrderCode()
 
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+
+    await orderLookupPage.buscar(order)
 
     /* Verificação feita pelo codegen com a opção 'Assert text' mas nao é a melhor validação, pois está verificando em todo o html (root), já que a página HTML não tem todos os IDs (acessibilidade) para a localização dos elementos
       await expect(page.locator('#root')).toContainText('Pedido não encontrado');
