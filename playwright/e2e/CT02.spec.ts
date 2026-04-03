@@ -1,36 +1,41 @@
-import { test, expect } from '@playwright/test';
-import fs from 'fs';
-import path from 'path';
+import { test } from '../support/fixtures'
 
-test('CT02 - Configuração do Veículo (Cores e Rodas) e Cálculo do Preço Base', async ({ page }) => {
-  // Ensure the evidence directory exists
-  const evidenceDir = path.join(process.cwd(), 'playwright', 'e2e', 'evidence', 'CT02');
-  if (!fs.existsSync(evidenceDir)) {
-    fs.mkdirSync(evidenceDir, { recursive: true });
-  }
+test.describe('Configuração do Veículo (Cores e Rodas) e Cálculo do Preço Base', () => {
+  test.beforeEach(async ({ app }) => {
+    await app.configurator.openFresh()
+  })
 
-  // Id 1: Verificar o preço inicial de venda
-  await page.goto('/configure');
-  await page.waitForLoadState('networkidle');
-  await expect(page.getByTestId('total-price')).toHaveText('R$ 40.000,00');
-  await page.screenshot({ path: path.join(evidenceDir, 'CT02_Passo1_PrecoInicial.png') });
+  // Cenário 1: Validação exclusiva da troca de cor
+  test('deve refletir a troca de cor corretamente na imagem e no preço', async ({
+    app,
+  }) => {
+    const { configurator } = app
 
-  // Id 2: Selecionar uma cor exterior diferente ("Midnight Black" ou "Lunar White")
-  await page.getByTestId('color-option-midnight-black').click();
-  await expect(page.getByTestId('total-price')).toHaveText('R$ 40.000,00');
-  // Wait a little for the model rendering to update if there's any animation
-  await page.waitForTimeout(500); 
-  await page.screenshot({ path: path.join(evidenceDir, 'CT02_Passo2_CorAlterada.png') });
+    await configurator.expectTotalPrice('R$ 40.000,00')
 
-  // Id 3: Selecionar a opção de roda "Sport Wheels"
-  await page.getByTestId('wheel-option-sport').click();
-  await expect(page.getByTestId('total-price')).toHaveText('R$ 42.000,00');
-  await page.waitForTimeout(500);
-  await page.screenshot({ path: path.join(evidenceDir, 'CT02_Passo3_RodaSport.png') });
+    await configurator.selectColor('Midnight Black')
 
-  // Id 4: Selecionar novamente a roda "Aero Wheels"
-  await page.getByTestId('wheel-option-aero').click();
-  await expect(page.getByTestId('total-price')).toHaveText('R$ 40.000,00');
-  await page.waitForTimeout(500);
-  await page.screenshot({ path: path.join(evidenceDir, 'CT02_Passo4_RodaAero.png') });
-});
+    await configurator.expectCarExteriorImage(/midnight-black/i, /midnight-black-aero-wheels/i)
+
+    await configurator.expectTotalPrice('R$ 40.000,00')
+  })
+
+  // Cenário 2: Validação exclusiva da troca de rodas
+  test('deve refletir a troca de rodas corretamente na imagem e no preço', async ({
+    app,
+  }) => {
+    const { configurator } = app
+
+    await configurator.expectTotalPrice('R$ 40.000,00')
+
+    await configurator.selectWheels(/Sport Wheels/)
+
+    await configurator.expectCarExteriorImage(/sport wheels/i, /glacier-blue-sport-wheels/i)
+
+    await configurator.expectTotalPrice('R$ 42.000,00')
+
+    await configurator.selectWheels(/Aero Wheels/)
+
+    await configurator.expectTotalPrice('R$ 40.000,00')
+  })
+})
