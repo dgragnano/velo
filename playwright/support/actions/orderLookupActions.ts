@@ -7,11 +7,12 @@ export type OrderDetails = {
   status: OrderStatus
   color: string
   wheels: string
-  customer: { name: string; email: string }
+  customer: { name: string; email: string; document: string; phone: string }
   payment: string
+  total_price: string
 }
 
-export function createOrderLockupActions(page: Page) {
+export function createOrderLookupActions(page: Page) {
 
   const orderInput = page.getByRole('textbox', { name: 'Número do Pedido' })
   const searchButton = page.getByRole('button', { name: 'Buscar Pedido' })
@@ -20,18 +21,16 @@ export function createOrderLockupActions(page: Page) {
 
     elements: {
       orderInput,
-      searchButton      
+      searchButton
     },
 
     async open() {
-
       await page.goto('/')
       const title = page.getByTestId('hero-section').getByRole('heading')
       await expect(title).toContainText('Velô Sprint')
 
-      await page.getByRole('link', {name: 'Consultar Pedido'}).click()
+      await page.getByRole('link', { name: 'Consultar Pedido' }).click()
       await expect(page.getByRole('heading')).toContainText('Consultar Pedido')
-      
     },
 
     async searchOrder(code: string) {
@@ -77,18 +76,18 @@ export function createOrderLockupActions(page: Page) {
         APROVADO: {
           background: 'bg-green-100',
           text: 'text-green-700',
-          icon: 'lucide-circle-check-big'
+          icon: 'lucide-circle-check-big',
         },
         REPROVADO: {
           background: 'bg-red-100',
           text: 'text-red-700',
-          icon: 'lucide-circle-x'
+          icon: 'lucide-circle-x',
         },
         EM_ANALISE: {
           background: 'bg-amber-100',
           text: 'text-amber-700',
-          icon: 'lucide-clock'
-        }
+          icon: 'lucide-clock',
+        },
       } as const
 
       const classes = statusClasses[status]
@@ -105,7 +104,6 @@ export function createOrderLockupActions(page: Page) {
       - heading "Pedido não encontrado" [level=3]
       - paragraph: Verifique o número do pedido e tente novamente
       `)
-    }
+    },
   }
 }
-

@@ -1,54 +1,44 @@
 import { Page, expect } from '@playwright/test'
 
 export function createConfiguratorActions(page: Page) {
-  const totalPrice = page.getByTestId('total-price')
-  const carExteriorImage = page.getByTestId('car-exterior-image')
-  const modelHeading = page.getByRole('heading', { name: 'Velô Sprint' })
-  const buildButton = page.getByRole('button', { name: 'Monte o Seu' })
+  const optionalCheckbox = (name: string | RegExp) => page.getByRole('checkbox', { name })
 
   return {
-    optionalCheckbox(name: string | RegExp) {
-      return page.getByRole('checkbox', { name })
-    },
-
-    async openFresh(options?: { assertBasePrice?: boolean }) {
-      await page.addInitScript(() => {
-        localStorage.removeItem('velo-configurator-storage')
-      })
+    async open() {
       await page.goto('/configure')
-      await expect(modelHeading).toBeVisible()
-      if (options?.assertBasePrice) {
-        await expect(totalPrice).toHaveText('R$ 40.000,00')
-      }
     },
 
-    async selectColor(buttonName: string) {
-      await page.getByRole('button', { name: buttonName }).click()
+    async selectColor(name: string) {
+      await page.getByRole('button', { name }).click()
     },
 
     async selectWheels(name: string | RegExp) {
       await page.getByRole('button', { name }).click()
     },
 
-    async expectTotalPrice(text: string) {
-      await expect(totalPrice).toHaveText(text)
+    async expectPrice(price: string) {
+      const priceElement = page.getByTestId('total-price')
+      await expect(priceElement).toBeVisible()
+      await expect(priceElement).toHaveText(price)
     },
 
-    async expectCarExteriorImage(alt: RegExp, src: RegExp) {
-      await expect(carExteriorImage).toHaveAttribute('alt', alt)
-      await expect(carExteriorImage).toHaveAttribute('src', src)
+    async expectCarImageSrc(src: string) {
+      const carImage = page.locator('img[alt^="Velô Sprint"]')
+      await expect(carImage).toHaveAttribute('src', src)
     },
 
-    async proceedToOrder() {
-      await buildButton.click()
-      await expect(page).toHaveURL(/\/order$/)
-      await expect(
-        page.getByRole('heading', { name: 'Finalizar Pedido' }),
-      ).toBeVisible()
+    async checkOptional(name: string | RegExp) {
+      await expect(optionalCheckbox(name)).toBeVisible()
+      await optionalCheckbox(name).check()
     },
 
-    async expectOrderSummaryTotal(text: string) {
-      await expect(page.getByTestId('summary-total-price')).toHaveText(text)
+    async uncheckOptional(name: string | RegExp) {
+      await expect(optionalCheckbox(name)).toBeVisible()
+      await optionalCheckbox(name).uncheck()
+    },
+
+    async finishConfigurator() {
+      await page.getByRole('button', { name: 'Monte o Seu' }).click()
     },
   }
 }

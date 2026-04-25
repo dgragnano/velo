@@ -1,19 +1,15 @@
 //função para criar coódigo de pedido dinâmico
 
 export function generateOrderCode() {
-    const prefix = 'VLO';
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numbers = '0123456789';
+    const prefix = 'VLO'
 
-    const randomLetters = (length) =>
-        Array.from({ length }, () =>
-            letters.charAt(Math.floor(Math.random() * letters.length))
-        ).join('');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    let randomPart = ''
 
-    const randomNumber = () =>
-        numbers.charAt(Math.floor(Math.random() * numbers.length));
+    for (let i = 0; i < 6; i++) {
+        const randomIndex = Math.floor(Math.random() * chars.length)
+        randomPart += chars[randomIndex]
+    }
 
-    const randomPart = randomLetters(5) + randomNumber();
-
-    return `${prefix}-${randomPart}`;
+    return `${prefix}-${randomPart}`
 }
