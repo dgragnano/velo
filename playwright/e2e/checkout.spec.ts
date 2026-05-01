@@ -283,9 +283,6 @@ test.describe('Checkout', () => {
       await app.mock.creditAnalysis(490)
 
       // Arrange
-      await page.goto('/')
-      await page.getByRole('link', { name: /Configure Agora/i }).click()
-
       await app.configurator.expectPrice(customer.totalPrice)
       await app.configurator.finishConfigurator()
       await app.checkout.expectLoaded()
