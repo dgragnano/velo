@@ -22,7 +22,7 @@ test.describe('Configuração do Veículo', () => {
 
     await app.configurator.selectWheels(/Aero Wheels/)
     await app.configurator.expectPrice('R$ 40.000,00')
-    await app.configurator.expectCarImageSrc(/glacier-blue-sport-wheels/)
+    await app.configurator.expectCarImageSrc(/glacier-blue-aero-wheels/)
   })
 
   test('deve atualizar o preço com opcionais e persistir no checkout', async ({ app }) => {
