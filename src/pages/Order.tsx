@@ -4,7 +4,7 @@ import ReactInputMask from 'react-input-mask';
 const InputMask = ReactInputMask as any;
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { z } from 'zod';
-import { cn, onlyDigits, isValidCpf, isValidEmailStrict } from '@/lib/utils';
+import { cn, isValidCpf, isValidEmailStrict, onlyDigits } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,8 +58,6 @@ const stores = [
   'Velô Morumbi - Av. Morumbi, 1500',
   'Velô Ibirapuera - Av. Ibirapuera, 3000',
 ];
-
-
 
 const orderSchema = z.object({
   name: z.string().trim().min(2, 'Nome deve ter pelo menos 2 caracteres'),

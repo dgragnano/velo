@@ -61,7 +61,7 @@ describe('configuratorStore', () => {
       const months = 12;
       const expected = (total * rate * Math.pow(1 + rate, months)) / (Math.pow(1 + rate, months) - 1);
       const roundedExpected = Math.round(expected * 100) / 100;
-      
+
       expect(calculateInstallment(total)).toBe(roundedExpected);
     });
   });
@@ -69,48 +69,30 @@ describe('configuratorStore', () => {
   describe('formatPrice', () => {
     it('should format price to BRL correctly', () => {
       const formatted = formatPrice(40000);
-      
+
       // We check for string components to avoid issues with narrow no-break space vs normal space in different Node environments
       expect(formatted).toContain('R$');
       expect(formatted).toContain('40.000,00');
     });
   });
 
-  describe('state actions (toggleOptional)', () => {
-    it('should add optional if not present', () => {
+  describe('toggleOptional', () => {
+    it('should add optional if not present and remove if already present', () => {
       // Setup initial state
-      useConfiguratorStore.setState({
-        configuration: {
-          exteriorColor: 'glacier-blue',
-          interiorColor: 'carbon-black',
-          wheelType: 'aero',
-          optionals: []
-        }
-      });
+      const store = useConfiguratorStore.getState();
+      store.resetConfiguration();
       
-      // Act
-      useConfiguratorStore.getState().toggleOptional('precision-park');
+      // Ensure it starts empty
+      expect(useConfiguratorStore.getState().configuration.optionals).toEqual([]);
       
-      // Assert
+      // Add optional
+      store.toggleOptional('precision-park');
       expect(useConfiguratorStore.getState().configuration.optionals).toContain('precision-park');
-    });
-
-    it('should remove optional if already present', () => {
-      // Setup initial state with optional already added
-      useConfiguratorStore.setState({
-        configuration: {
-          exteriorColor: 'glacier-blue',
-          interiorColor: 'carbon-black',
-          wheelType: 'aero',
-          optionals: ['precision-park']
-        }
-      });
       
-      // Act
-      useConfiguratorStore.getState().toggleOptional('precision-park');
-      
-      // Assert
+      // Remove optional
+      store.toggleOptional('precision-park');
       expect(useConfiguratorStore.getState().configuration.optionals).not.toContain('precision-park');
+      expect(useConfiguratorStore.getState().configuration.optionals).toEqual([]);
     });
   });
 });
