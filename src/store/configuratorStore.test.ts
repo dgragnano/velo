@@ -3,7 +3,8 @@ import {
   calculateTotalPrice,
   calculateInstallment,
   formatPrice,
-  CarConfiguration
+  CarConfiguration,
+  useConfiguratorStore
 } from './configuratorStore';
 
 describe('configuratorStore', () => {
@@ -72,6 +73,44 @@ describe('configuratorStore', () => {
       // We check for string components to avoid issues with narrow no-break space vs normal space in different Node environments
       expect(formatted).toContain('R$');
       expect(formatted).toContain('40.000,00');
+    });
+  });
+
+  describe('state actions (toggleOptional)', () => {
+    it('should add optional if not present', () => {
+      // Setup initial state
+      useConfiguratorStore.setState({
+        configuration: {
+          exteriorColor: 'glacier-blue',
+          interiorColor: 'carbon-black',
+          wheelType: 'aero',
+          optionals: []
+        }
+      });
+      
+      // Act
+      useConfiguratorStore.getState().toggleOptional('precision-park');
+      
+      // Assert
+      expect(useConfiguratorStore.getState().configuration.optionals).toContain('precision-park');
+    });
+
+    it('should remove optional if already present', () => {
+      // Setup initial state with optional already added
+      useConfiguratorStore.setState({
+        configuration: {
+          exteriorColor: 'glacier-blue',
+          interiorColor: 'carbon-black',
+          wheelType: 'aero',
+          optionals: ['precision-park']
+        }
+      });
+      
+      // Act
+      useConfiguratorStore.getState().toggleOptional('precision-park');
+      
+      // Assert
+      expect(useConfiguratorStore.getState().configuration.optionals).not.toContain('precision-park');
     });
   });
 });
