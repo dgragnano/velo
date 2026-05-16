@@ -79,9 +79,15 @@ jobs:
           --token=$VERCEL_TOKEN \
           --scope=$VERCEL_SCOPE
 
-      # 6. Build com as variáveis do Supabase de preview embutidas no bundle
+      # 6. Build com as variáveis do Supabase de preview embutidas no bundle.
+      #    As variáveis são injetadas diretamente via GitHub Secrets para garantir
+      #    que o Vite as embuta no bundle, independentemente do vercel pull.
       - name: Build Vercel (Preview)
         run: yarn vercel build --token=$VERCEL_TOKEN
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_PREVIEW_URL }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PREVIEW_PROJECT_ID }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PREVIEW_PUBLISHABLE_KEY }}
 
       # 7. Deploy preview no Vercel
       - name: Deploy preview
