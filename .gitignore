@@ -31,3 +31,7 @@ dist-ssr
 /playwright/.auth/
 
 .vercel
+
+# Supabase CLI binary (baixado localmente, não versionado)
+supabase.exe
+supabase/.temp/
