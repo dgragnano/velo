@@ -70,8 +70,6 @@ jobs:
         run: yarn install
 
       # 5. Baixa as configurações de build do ambiente Preview da Vercel.
-      #    As variáveis VITE_SUPABASE_* de preview NÃO estão no painel da Vercel,
-      #    portanto o vercel pull não baixa nenhum valor para elas.
       - name: Pull Vercel Config (Preview)
         run: |
           yarn vercel pull --yes \
@@ -79,23 +77,20 @@ jobs:
           --token=$VERCEL_TOKEN \
           --scope=$VERCEL_SCOPE
 
-      # 6. Injeta as variáveis do Supabase de preview em .env.local APÓS o vercel pull.
-      #    .env.local tem prioridade máxima no Vite e garante que o bundle de preview
-      #    NUNCA embuta a URL do Supabase de produção, independente do que vercel pull baixou.
-      - name: Inject Preview Supabase vars into .env.local
+      # 6. Sobrescreve .vercel/.env.preview.local com as variáveis do Supabase de preview.
+      #    O `vercel build` lê ESTE arquivo para injetar vars no processo de build.
+      #    Sobrescrevendo após o pull, garantimos que nenhuma var de produção
+      #    vaze para o bundle de preview (independente do escopo configurado na Vercel).
+      - name: Override Vercel preview env with preview Supabase vars
         run: |
           printf "VITE_SUPABASE_URL=%s\nVITE_SUPABASE_PROJECT_ID=%s\nVITE_SUPABASE_PUBLISHABLE_KEY=%s\n" \
             "${{ secrets.SUPABASE_PREVIEW_URL }}" \
             "${{ secrets.SUPABASE_PREVIEW_PROJECT_ID }}" \
-            "${{ secrets.SUPABASE_PREVIEW_PUBLISHABLE_KEY }}" > .env.local
+            "${{ secrets.SUPABASE_PREVIEW_PUBLISHABLE_KEY }}" > .vercel/.env.preview.local
 
       # 7. Build com as variáveis do Supabase de preview embutidas no bundle
       - name: Build Vercel (Preview)
         run: yarn vercel build --token=$VERCEL_TOKEN
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_PREVIEW_URL }}
-          VITE_SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PREVIEW_PROJECT_ID }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PREVIEW_PUBLISHABLE_KEY }}
 
       # 8. Deploy preview no Vercel
       - name: Deploy preview
